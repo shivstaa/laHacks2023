@@ -1,4 +1,4 @@
---Group Info
+--- Group Info
 
 - Shubh
 - Teresa
