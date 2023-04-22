@@ -1,5 +1,4 @@
---- Group Info
-
+-- Group Info
 - Shubh
 - Teresa
 - Aayush 
