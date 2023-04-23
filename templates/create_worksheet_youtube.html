@@ -83,7 +83,7 @@
     <form id="worksheet-form" action="{{ url_for('create_worksheet_youtube') }}" method="POST">
         <input type="hidden" name="user_id" value="{{ user.id }}">
         <div class="mb3">
-            <label for="input-text" class="form-label">Enter your text:</label>
+            <label for="input-text" class="form-label">Enter YouTube URL:</label>
             <input type="text" class="form-control" name="youtube_url" id="youtube_url" placeholder="Paste YouTube URL here">
         </div>
             <div class="mb-3">

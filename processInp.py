@@ -1,9 +1,11 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract
-import requests
+import wikipediaapi
+import re
 from bs4 import BeautifulSoup
 from pytesseract import pytesseract
 from PIL import Image
+
 def get_text_from_youtube(url):
     video_id=extract.video_id(url)
     try:
@@ -21,12 +23,37 @@ def get_text_from_youtube(url):
 
 # x=get_text_from_youtube('https://youtu.be/58N2N7zJGrQ')
 # print(x)
-def get_text_from_wikipedia(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    content = soup.find(id='content').get_text()
-    return content
 
+def get_title_from_url(url):
+    pattern = r'(?:https?:\/\/)?(?:www\.)?([a-z]{2}|simple)\.wikipedia\.org\/wiki\/(.+)$'
+    match = re.search(pattern, url)
+    if match:
+        return match.group(2)
+    else:
+        return None
+def get_wikipedia_text(page_title, language='en'):
+    wiki = wikipediaapi.Wikipedia(language)
+    page = wiki.page(page_title)
+
+    if page.exists():
+        return page.text
+    else:
+        return None
+def get_text_from_wikipedia(url):
+    page_title = get_title_from_url(url)
+    if page_title:
+        text = get_wikipedia_text(page_title)
+        if text:
+            pass
+            return text[:2500]
+        else:
+            print("Page not found")
+    else:
+        print("Invalid URL")
+    return None
+# x=(get_text_from_wiki('https://en.wikipedia.org/wiki/Native_American_self-determination'))
+# print(type(x))
+# print(x)
 def get_text_from_image(image_path):
     img = Image.open(image_path)
     text = pytesseract.image_to_string(img)

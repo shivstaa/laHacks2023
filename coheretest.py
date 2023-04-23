@@ -74,18 +74,18 @@ def generate_questions_with_cohere(text, qtype):
             return_likelihoods='NONE')
     return (response.generations)
 
-trial_text="""
-The Indian independence movement was a series of historic events with the ultimate aim of ending British rule in India. It lasted from 1857 to 1947.
+# trial_text="""
+# The Indian independence movement was a series of historic events with the ultimate aim of ending British rule in India. It lasted from 1857 to 1947.
 
-The first nationalistic revolutionary movement for Indian independence emerged from Bengal. It later took root in the newly formed Indian National Congress with prominent moderate leaders seeking the right to appear for Indian Civil Service examinations in British India, as well as more economic rights for natives. The first half of the 20th century saw a more radical approach towards self-rule by the Lal Bal Pal triumvirate, Aurobindo Ghosh and V. O. Chidambaram Pillai.
+# The first nationalistic revolutionary movement for Indian independence emerged from Bengal. It later took root in the newly formed Indian National Congress with prominent moderate leaders seeking the right to appear for Indian Civil Service examinations in British India, as well as more economic rights for natives. The first half of the 20th century saw a more radical approach towards self-rule by the Lal Bal Pal triumvirate, Aurobindo Ghosh and V. O. Chidambaram Pillai.
 
-The final stages of the independence struggle in the 1920s were characterized by Congress' adoption of Mahatma Gandhi's policy of non-violence and civil disobedience. Some of the leading followers of Gandhi's ideology were Jawaharlal Nehru, Vallabhbhai Patel, Abdul Ghaffar Khan, Maulana Azad, and others. Intellectuals such as Rabindranath Tagore, Subramania Bharati, and Bankim Chandra Chattopadhyay spread patriotic awareness. Female leaders like Sarojini Naidu, Vijaya Lakshmi Pandit, Pritilata Waddedar, and Kasturba Gandhi promoted the emancipation of Indian women and their participation in the freedom struggle.
+# The final stages of the independence struggle in the 1920s were characterized by Congress' adoption of Mahatma Gandhi's policy of non-violence and civil disobedience. Some of the leading followers of Gandhi's ideology were Jawaharlal Nehru, Vallabhbhai Patel, Abdul Ghaffar Khan, Maulana Azad, and others. Intellectuals such as Rabindranath Tagore, Subramania Bharati, and Bankim Chandra Chattopadhyay spread patriotic awareness. Female leaders like Sarojini Naidu, Vijaya Lakshmi Pandit, Pritilata Waddedar, and Kasturba Gandhi promoted the emancipation of Indian women and their participation in the freedom struggle.
 
-Few leaders followed a more violent approach. This became especially popular after the Rowlatt Act, which permitted indefinite detention. The Act sparked protests across India, especially in the Punjab province, where they were violently suppressed in the Jallianwala Bagh massacre.
+# Few leaders followed a more violent approach. This became especially popular after the Rowlatt Act, which permitted indefinite detention. The Act sparked protests across India, especially in the Punjab province, where they were violently suppressed in the Jallianwala Bagh massacre.
 
-The Indian independence movement was in constant ideological evolution. Essentially anti-colonial, it was supplemented by visions of independent, economic development with a secular, democratic, republican, and civil-libertarian political structure. After the 1930s, the movement took on a strong socialist orientation. It culminated in the Indian Independence Act 1947, which ended Crown suzerainty and partitioned British Raj into Dominion of India and Dominion of Pakistan.
+# The Indian independence movement was in constant ideological evolution. Essentially anti-colonial, it was supplemented by visions of independent, economic development with a secular, democratic, republican, and civil-libertarian political structure. After the 1930s, the movement took on a strong socialist orientation. It culminated in the Indian Independence Act 1947, which ended Crown suzerainty and partitioned British Raj into Dominion of India and Dominion of Pakistan.
 
-India remained a Crown Dominion until 26 January 1950, when the Constitution of India established the Republic of India. Pakistan remained a dominion until 1956 when it adopted its first constitution. In 1971, East Pakistan declared its own independence as Bangladesh.[1]"""
+# India remained a Crown Dominion until 26 January 1950, when the Constitution of India established the Republic of India. Pakistan remained a dominion until 1956 when it adopted its first constitution. In 1971, East Pakistan declared its own independence as Bangladesh.[1]"""
 
 def gen_mcqs(text, num_gen):
     qlist = []

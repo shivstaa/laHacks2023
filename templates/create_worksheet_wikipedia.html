@@ -80,20 +80,39 @@
     </div>
 
     <h2>Create Worksheet from Wikipedia</h2>
-    <form action="{{ url_for('create_worksheet_wikipedia') }}" method="POST">
-        <div class="input-group">
+    <form id="worksheet-form" action="{{ url_for('create_worksheet_wikipedia') }}" method="POST">
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <div class="mb3">
+            <label for="input-text" class="form-label">Enter Wiki URL:</label>
             <input type="text" class="form-control" name="wikipedia_url" id="wikipedia_url" placeholder="Paste Wikipedia URL here">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-wikipedia-w"></i></button>
-            </div>
         </div>
-        <p class="help-text">Paste a valid Wikipedia URL</p>
+        <div class="mb-3">
+            <label for="num-mcqs" class="form-label">Number of MCQs:</label>
+            <input type="number" class="form-control" name="num-mcqs" id="num-mcqs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-tfs" class="form-label">Number of True/False:</label>
+            <input type="number" class="form-control" name="num-tfs" id="num-tfs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-fibs" class="form-label">Number of Fill-in-the-blanks:</label>
+            <input type="number" class="form-control" name="num-fibs" id="num-fibs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="w-title" class="form-label">Worksheet Title:</label>
+            <textarea class="form-control" id="w-title" name="w-title" rows="1"></textarea>
+        </div>
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-wikipedia-w"></i>    SUBMIT</button>
+        </div>
     </form>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    const worksheetForm = document.getElementById("worksheet-form");
+    const loadingModal = document.getElementById("loading-modal");
     document.querySelector("form").addEventListener("submit", function(event) {
         const wikipediaUrl = document.getElementById("wikipedia_url");
         if (!wikipediaUrl.value) {
@@ -103,19 +122,16 @@
             alert("Please enter a valid Wikipedia URL");
             event.preventDefault();
         }
+        else{
+        event.preventDefault();
+        loadingModal.style.display = "block";
+        worksheetForm.submit();
+        }
     });
 
     function isWikipediaUrl(url) {
         const pattern = /^(?:https?:\/\/)?(?:www\.)?([a-z]{2}|simple)\.wikipedia\.org\/wiki\/.+/;
         return pattern.test(url);
     }
-    const worksheetForm = document.getElementById("worksheet-form");
-    const loadingModal = document.getElementById("loading-modal");
-
-    worksheetForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        loadingModal.style.display = "block";
-        worksheetForm.submit();
-    });
 </script>
 {% endblock %}

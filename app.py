@@ -7,7 +7,7 @@ from cohere import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from genpdf import generate_pdfs
 import hashlib
-from processInp import get_text_from_youtube
+from processInp import get_text_from_wikipedia, get_text_from_youtube
 from coheretest import gen_fib, gen_mcqs, gen_tf
 app = Flask(__name__)
 # Configure SQLite database
@@ -355,7 +355,7 @@ def create_worksheet_wikipedia():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        input_text = request.form['input-text']
+        input_text = get_text_from_wikipedia(request.form['wikipedia_url'])
         w_title = str(request.form['w-title'])
         num_mcqs = int(request.form['num-mcqs'])
         num_tfs = int(request.form['num-tfs'])
