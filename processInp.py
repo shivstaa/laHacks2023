@@ -5,11 +5,11 @@ import re
 from bs4 import BeautifulSoup
 from pytesseract import pytesseract
 from PIL import Image
-
+pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 def get_text_from_youtube(url):
     video_id=extract.video_id(url)
     try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en', 'en-US', 'en-GB', 'a.en'])
     except Exception as e:
         print(f"Error fetching transcript: {e}")
         return ''
@@ -54,7 +54,11 @@ def get_text_from_wikipedia(url):
 # x=(get_text_from_wiki('https://en.wikipedia.org/wiki/Native_American_self-determination'))
 # print(type(x))
 # print(x)
-def get_text_from_image(image_path):
-    img = Image.open(image_path)
-    text = pytesseract.image_to_string(img)
-    return text
+def get_text_from_image(img):
+    try:
+        text = pytesseract.image_to_string(img)
+        return text
+    except:
+        return None
+
+# print(get_text_from_image('./static/testsc.jpg'))

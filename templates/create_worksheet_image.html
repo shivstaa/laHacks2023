@@ -2,24 +2,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
-<script>
-    function validateImageFileSize(input) {
-        if (input.files[0].size > 5 * 1024 * 1024) {
-            alert("The uploaded image exceeds the maximum allowed size of 5 MB. Please upload a smaller image.");
-            input.value = "";
-            return false;
-        }
-        return true;
-    }
-    const worksheetForm = document.getElementById("worksheet-form");
-    const loadingModal = document.getElementById("loading-modal");
-
-    worksheetForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        loadingModal.style.display = "block";
-        worksheetForm.submit();
-    });
-</script>
     <style>
     .modal {
         display: none;
@@ -99,14 +81,61 @@
     </div>
     
     <h2>Create Worksheet from Image</h2>
-    <form action="{{ url_for('create_worksheet_image') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateImageFileSize(document.getElementById('image_file'));">
-        <div class="upload-btn-wrapper">
-            <button class="btn-upload"><i class="far fa-image"></i></button>
-            <input type="file" name="image_file" id="image_file" accept="image/*" />
+    <form id="worksheet-form" action="{{ url_for('create_worksheet_image') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateImageFileSize(document.getElementById('image_file'));">
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <div class="mb3">
+            <p class="help-text">Upload Image</p>
+            <div class="upload-btn-wrapper">
+                <button class="btn-upload"><i class="far fa-image"></i></button>
+                <input type="file" name="image_file" id="image_file" accept="image/*" />
+            </div>
         </div>
-        <p class="help-text">Upload Image</p>
+        <div class="mb-3">
+            <label for="num-mcqs" class="form-label">Number of MCQs:</label>
+            <input type="number" class="form-control" name="num-mcqs" id="num-mcqs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-tfs" class="form-label">Number of True/False:</label>
+            <input type="number" class="form-control" name="num-tfs" id="num-tfs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-fibs" class="form-label">Number of Fill-in-the-blanks:</label>
+            <input type="number" class="form-control" name="num-fibs" id="num-fibs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="w-title" class="form-label">Worksheet Title:</label>
+            <textarea class="form-control" id="w-title" name="w-title" rows="1"></textarea>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    function validateImageFileSize(input) {
+        if (input.files[0].size > 5 * 1024 * 1024) {
+            alert("The uploaded image exceeds the maximum allowed size of 5 MB. Please upload a smaller image.");
+            input.value = "";
+            return false;
+        }
+        return true;
+    }
+
+    const worksheetForm = document.getElementById("worksheet-form");
+    const loadingModal = document.getElementById("loading-modal");
+
+    worksheetForm.addEventListener("submit", function(event) {
+        const imageFile = document.getElementById("image_file");
+        if (!validateImageFileSize(imageFile)) {
+            event.preventDefault();
+        } else {
+            event.preventDefault();
+            loadingModal.style.display = "block";
+            worksheetForm.submit();
+        }
+    });
+</script>
 {% endblock %}

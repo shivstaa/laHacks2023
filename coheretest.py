@@ -3,8 +3,10 @@ import json
 from sscore import similarity_score
 # Set up Cohere API key
 api_key = 'OJSt94oO9pxwQUlJ16DAnOcsi0AYQyXwXa4s0PQq'
+prod = '7QSyYOBXLh2IPLvCC7gADRMZUZnBbA5d9KnhFk7b'
+
 # Initialize Cohere client
-co = Client(api_key=api_key)
+co = Client(api_key=prod)
 
 def parse_question_response(obj):
     try:
