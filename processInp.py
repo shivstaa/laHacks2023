@@ -5,6 +5,9 @@ import re
 from bs4 import BeautifulSoup
 from pytesseract import pytesseract
 from PIL import Image
+import PyPDF2
+import speech_recognition as sr
+
 pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
 def get_text_from_youtube(url):
     video_id=extract.video_id(url)
@@ -62,3 +65,28 @@ def get_text_from_image(img):
         return None
 
 # print(get_text_from_image('./static/testsc.jpg'))
+
+
+def extract_text_from_pdf(pdf_file):
+    reader = PyPDF2.PdfReader(pdf_file.stream, strict=False)
+    pdf_text = []
+
+    for page in reader.pages:
+        content = page.extract_text()
+        pdf_text.append(content)
+
+    return " ".join(pdf_text)[:2000]
+
+
+def get_text_from_audio(audio_file, duration=300):
+    recognizer = sr.Recognizer()
+
+    with sr.AudioFile(audio_file) as source:
+        audio_data = recognizer.record(source, duration=duration)
+        try:
+            text = recognizer.recognize_google(audio_data)
+            return text
+        except sr.UnknownValueError:
+            return "Could not understand the audio."
+        except sr.RequestError:
+            return "Error occurred during the request. Please try again."

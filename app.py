@@ -8,7 +8,7 @@ from cohere import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from genpdf import generate_pdfs
 import hashlib
-from processInp import get_text_from_image, get_text_from_wikipedia, get_text_from_youtube
+from processInp import extract_text_from_pdf, get_text_from_audio, get_text_from_image, get_text_from_wikipedia, get_text_from_youtube
 from coheretest import gen_fib, gen_mcqs, gen_tf
 
 app = Flask(__name__)
@@ -255,7 +255,7 @@ def create_worksheet_pdf():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        input_text = request.form['input-text']
+        input_text = extract_text_from_pdf(request.files['pdf_file'])
         w_title = str(request.form['w-title'])
         num_mcqs = int(request.form['num-mcqs'])
         num_tfs = int(request.form['num-tfs'])
@@ -462,7 +462,7 @@ def create_worksheet_audio():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        input_text = request.form['input-text']
+        input_text = get_text_from_audio(request.files['audio_file'])
         w_title = str(request.form['w-title'])
         num_mcqs = int(request.form['num-mcqs'])
         num_tfs = int(request.form['num-tfs'])

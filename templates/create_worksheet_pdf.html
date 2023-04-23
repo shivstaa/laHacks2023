@@ -2,36 +2,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.1/pdf.min.js"></script>
-<script>
-    function validatePDF(input) {
-        if (input.files[0].size > 5 * 1024 * 1024) {
-            alert("The uploaded PDF exceeds the maximum allowed size of 5 MB. Please upload a smaller PDF.");
-            input.value = "";
-            return false;
-        }
-        const fileReader = new FileReader();
-        fileReader.onload = async function(e) {
-            const typedArray = new Uint8Array(e.target.result);
-            const pdfDoc = await pdfjsLib.getDocument({data: typedArray}).promise;
-            if (pdfDoc.numPages > 1) {
-                alert("The uploaded PDF has more than one page. Please upload a single-page PDF.");
-                input.value = "";
-                return false;
-            }
-        };
-        fileReader.readAsArrayBuffer(input.files[0]);
-        return true;
-    }
-    const worksheetForm = document.getElementById("worksheet-form");
-    const loadingModal = document.getElementById("loading-modal");
-
-    worksheetForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        loadingModal.style.display = "block";
-        worksheetForm.submit();
-    });
-</script>
 <style>
     .modal {
         display: none;
@@ -109,16 +79,43 @@
              </div>
         </div>
     </div>
-    
     <h2>Create Worksheet from PDF</h2>
-    <form style = "justify-content: center;"action="{{ url_for('create_worksheet_pdf') }}" method="POST" enctype="multipart/form-data" onsubmit="return validatePDF(document.getElementById('pdf_file'));">
-        <div class="upload-btn-wrapper">
-            <button class="btn-upload"><i class="fas fa-file-pdf"></i></button>
-            <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" />
+    <form id="worksheet-form" action="{{ url_for('create_worksheet_pdf') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <div class="mb-3">
+            <p class="help-text">Upload PDF</p>
+            <div class="upload-btn-wrapper">
+                <i class="fas fa-file-pdf"></i>
+                <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" />
+            </div>
         </div>
-        <p class="help-text">Upload PDF</p>
+        <div class="mb-3">
+            <label for="num-mcqs" class="form-label">Number of MCQs:</label>
+            <input type="number" class="form-control" name="num-mcqs" id="num-mcqs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-tfs" class="form-label">Number of True/False:</label>
+            <input type="number" class="form-control" name="num-tfs" id="num-tfs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-fibs" class="form-label">Number of Fill-in-the-blanks:</label>
+            <input type="number" class="form-control" name="num-fibs" id="num-fibs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="w-title" class="form-label">Worksheet Title:</label>
+            <textarea class="form-control" id="w-title" name="w-title" rows="1"></textarea>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
+{% endblock %}
 
+{% block script %}
+const worksheetForm = document.getElementById("worksheet-form");
+const loadingModal = document.getElementById("loading-modal");
+worksheetForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    loadingModal.style.display = "block";
+    worksheetForm.submit();
+});
 {% endblock %}

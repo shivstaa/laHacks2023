@@ -99,14 +99,57 @@
     </div>
     
     <h2>Create Worksheet from Audio</h2>
-    <form action="{{ url_for('create_worksheet_audio') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateFileSize(document.getElementById('audio_file'));">
-        <div class="upload-btn-wrapper">
-            <button class="btn-upload"><i class="fas fa-music"></i></button>
-            <input type="file" name="audio_file" id="audio_file" accept="audio/*" />
+    <form id="worksheet-form" action="{{ url_for('create_worksheet_audio') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateAudioDuration(document.getElementById('audio_file'));">
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <div class="mb-3">
+            <p class="help-text">Upload Audio</p>
+            <div class="upload-btn-wrapper">
+                <i class="fas fa-file-audio"></i>
+                <input type="file" name="audio_file" id="audio_file" accept="audio/*" />
+            </div>
         </div>
-        <p class="help-text">Upload Audio</p>
+        <div class="mb-3">
+            <label for="num-mcqs" class="form-label">Number of MCQs:</label>
+            <input type="number" class="form-control" name="num-mcqs" id="num-mcqs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-tfs" class="form-label">Number of True/False:</label>
+            <input type="number" class="form-control" name="num-tfs" id="num-tfs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="num-fibs" class="form-label">Number of Fill-in-the-blanks:</label>
+            <input type="number" class="form-control" name="num-fibs" id="num-fibs" min="0" max="10" step="1" value="0">
+        </div>
+        <div class="mb-3">
+            <label for="w-title" class="form-label">Worksheet Title:</label>
+            <textarea class="form-control" id="w-title" name="w-title" rows="1"></textarea>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
 
+{% endblock %}
+% block script %}
+const worksheetForm = document.getElementById("worksheet-form");
+const loadingModal = document.getElementById("loading-modal");
+worksheetForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    loadingModal.style.display = "block";
+    worksheetForm.submit();
+});
+
+async function validateAudioDuration(input) {
+    const audio = new Audio(URL.createObjectURL(input.files[0]));
+    const durationPromise = new Promise(resolve => {
+        audio.addEventListener("loadedmetadata", () => resolve(audio.duration));
+    });
+
+    const duration = await durationPromise;
+    if (duration > 300) {
+        alert("The uploaded audio exceeds the maximum allowed duration of 5 minutes. Please upload a shorter audio.");
+        input.value = "";
+        return false;
+    }
+    return true;
+}
 {% endblock %}
