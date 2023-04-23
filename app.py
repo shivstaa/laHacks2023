@@ -3,12 +3,14 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 import requests
 import os, json
+from PIL import Image
 from cohere import Client
 from werkzeug.security import check_password_hash, generate_password_hash
 from genpdf import generate_pdfs
 import hashlib
-from processInp import get_text_from_wikipedia, get_text_from_youtube
+from processInp import get_text_from_image, get_text_from_wikipedia, get_text_from_youtube
 from coheretest import gen_fib, gen_mcqs, gen_tf
+
 app = Flask(__name__)
 # Configure SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///questions.db'
@@ -304,7 +306,7 @@ def create_worksheet_image():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
-        input_text = request.form['input-text']
+        input_text = get_text_from_image(Image.open(request.files['image_file']))
         w_title = str(request.form['w-title'])
         num_mcqs = int(request.form['num-mcqs'])
         num_tfs = int(request.form['num-tfs'])
