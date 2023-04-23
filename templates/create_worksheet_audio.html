@@ -2,7 +2,25 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
-<style>
+<script>
+    function validateFileSize(input) {
+        if (input.files[0].size > 5 * 1024 * 1024) {
+            alert("The uploaded file exceeds the maximum allowed size of 5 MB. Please upload a smaller file.");
+            input.value = "";
+            return false;
+        }
+        return true;
+    }
+    const worksheetForm = document.getElementById("worksheet-form");
+    const loadingModal = document.getElementById("loading-modal");
+
+    worksheetForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        loadingModal.style.display = "block";
+        worksheetForm.submit();
+    });
+</script>
+    <style>
     .modal {
         display: none;
         position: fixed;
@@ -65,7 +83,8 @@
         }
     }
 </style>
-<div class="container mt-4">
+
+<div class="container mt-4 full-height box">
     <div id="loading-modal" class="modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -78,44 +97,16 @@
              </div>
         </div>
     </div>
-
-    <h2>Create Worksheet from Wikipedia</h2>
-    <form action="{{ url_for('create_worksheet_wikipedia') }}" method="POST">
-        <div class="input-group">
-            <input type="text" class="form-control" name="wikipedia_url" id="wikipedia_url" placeholder="Paste Wikipedia URL here">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-wikipedia-w"></i></button>
-            </div>
+    
+    <h2>Create Worksheet from Audio</h2>
+    <form action="{{ url_for('create_worksheet_audio') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateFileSize(document.getElementById('audio_file'));">
+        <div class="upload-btn-wrapper">
+            <button class="btn-upload"><i class="fas fa-music"></i></button>
+            <input type="file" name="audio_file" id="audio_file" accept="audio/*" />
         </div>
-        <p class="help-text">Paste a valid Wikipedia URL</p>
+        <p class="help-text">Upload Audio</p>
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script>
-    document.querySelector("form").addEventListener("submit", function(event) {
-        const wikipediaUrl = document.getElementById("wikipedia_url");
-        if (!wikipediaUrl.value) {
-            alert("Please enter a URL");
-            event.preventDefault();
-        } else if (!isWikipediaUrl(wikipediaUrl.value)) {
-            alert("Please enter a valid Wikipedia URL");
-            event.preventDefault();
-        }
-    });
-
-    function isWikipediaUrl(url) {
-        const pattern = /^(?:https?:\/\/)?(?:www\.)?([a-z]{2}|simple)\.wikipedia\.org\/wiki\/.+/;
-        return pattern.test(url);
-    }
-    const worksheetForm = document.getElementById("worksheet-form");
-    const loadingModal = document.getElementById("loading-modal");
-
-    worksheetForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-        loadingModal.style.display = "block";
-        worksheetForm.submit();
-    });
-</script>
 {% endblock %}

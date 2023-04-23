@@ -21,6 +21,7 @@
                 <td>
                     <a href="{{ url_for('download_worksheet_questions', worksheet_id=worksheet.id) }}" class="btn btn-primary">View Question Sheet</a>
                     <a href="{{ url_for('download_worksheet_answers', worksheet_id=worksheet.id) }}" class="btn btn-secondary">View Answer Sheet</a>
+                    <a href="{{ url_for('delete_worksheet', worksheet_id=worksheet.id) }}" class="btn btn-danger">Delete Worksheet</a>
                 </td>
             </tr>
             {% endfor %}

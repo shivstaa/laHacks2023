@@ -2,9 +2,104 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
-<div class="container mt-4">
+<script>
+    function validateImageFileSize(input) {
+        if (input.files[0].size > 5 * 1024 * 1024) {
+            alert("The uploaded image exceeds the maximum allowed size of 5 MB. Please upload a smaller image.");
+            input.value = "";
+            return false;
+        }
+        return true;
+    }
+    const worksheetForm = document.getElementById("worksheet-form");
+    const loadingModal = document.getElementById("loading-modal");
+
+    worksheetForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        loadingModal.style.display = "block";
+        worksheetForm.submit();
+    });
+</script>
+    <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal .modal-dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        margin: 0;
+    }
+    .loader-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .lds-facebook {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+    .lds-facebook div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: #007bff;
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+    .lds-facebook div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+    }
+    .lds-facebook div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+    }
+    .lds-facebook div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0;
+    }
+    @keyframes lds-facebook {
+        0% {
+            top: 8px;
+            height: 64px;
+        }
+        50%, 100% {
+            top: 24px;
+            height: 32px;
+        }
+    }
+</style>
+
+<div class="container mt-4 full-height box">
+    <div id="loading-modal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loader-wrapper">
+                    <div class="lds-facebook"><div></div><div></div><div></div></div>
+                <div class="modal-body">
+                    <p class="text-center">Processing...</p>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+    
     <h2>Create Worksheet from Image</h2>
-    <form action="{{ url_for('create_worksheet_image') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('create_worksheet_image') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateImageFileSize(document.getElementById('image_file'));">
         <div class="upload-btn-wrapper">
             <button class="btn-upload"><i class="far fa-image"></i></button>
             <input type="file" name="image_file" id="image_file" accept="image/*" />

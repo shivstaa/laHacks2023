@@ -1,11 +1,33 @@
-def process_input(input_data, input_type):
-    # Process the input data based on its type
-    if input_type == 'text':
-        text = input_data
-    # elif input_type == 'pdf':
-    #     text = extract_text_from_pdf(input_data)
-    # elif input_type == 'docx':
-    #     text = extract_text_from_docx(input_data)
-    # # ... add more processing functions for other input types
-    
+from youtube_transcript_api import YouTubeTranscriptApi
+from pytube import extract
+import requests
+from bs4 import BeautifulSoup
+from pytesseract import pytesseract
+from PIL import Image
+def get_text_from_youtube(url):
+    video_id=extract.video_id(url)
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+    except Exception as e:
+        print(f"Error fetching transcript: {e}")
+        return ''
+
+    # Combine all parts of the transcript and limit the text to 1500 words
+    text = ' '.join([part['text'] for part in transcript])
+    words = text.split()
+    limited_text = ' '.join(words[:2000])
+
+    return limited_text
+
+# x=get_text_from_youtube('https://youtu.be/58N2N7zJGrQ')
+# print(x)
+def get_text_from_wikipedia(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    content = soup.find(id='content').get_text()
+    return content
+
+def get_text_from_image(image_path):
+    img = Image.open(image_path)
+    text = pytesseract.image_to_string(img)
     return text

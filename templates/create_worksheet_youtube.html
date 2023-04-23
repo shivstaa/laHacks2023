@@ -2,23 +2,118 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+    }
+    .modal .modal-dialog {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        margin: 0;
+    }
+    .loader-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .lds-facebook {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+    .lds-facebook div {
+        display: inline-block;
+        position: absolute;
+        left: 8px;
+        width: 16px;
+        background: #007bff;
+        animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+    }
+    .lds-facebook div:nth-child(1) {
+        left: 8px;
+        animation-delay: -0.24s;
+    }
+    .lds-facebook div:nth-child(2) {
+        left: 32px;
+        animation-delay: -0.12s;
+    }
+    .lds-facebook div:nth-child(3) {
+        left: 56px;
+        animation-delay: 0;
+    }
+    @keyframes lds-facebook {
+        0% {
+            top: 8px;
+            height: 64px;
+        }
+        50%, 100% {
+            top: 24px;
+            height: 32px;
+        }
+    }
+</style>
 <div class="container mt-4">
-    <h2>Create Worksheet from YouTube</h2>
-    <form action="{{ url_for('create_worksheet_youtube') }}" method="POST">
-        <div class="input-group">
-            <input type="text" class="form-control" name="youtube_url" id="youtube_url" placeholder="Paste YouTube URL here">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary"
-                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-youtube"></i></button>
-            </div>
+    <div id="loading-modal" class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="loader-wrapper">
+                    <div class="lds-facebook"><div></div><div></div><div></div></div>
+                <div class="modal-body">
+                    <p class="text-center">Processing...</p>
+                    </div>
+                </div>
+             </div>
         </div>
-        <p class="help-text">Paste a valid YouTube URL</p>
+    </div>
+
+    <h2>Create Worksheet from YouTube</h2>
+    <form id="worksheet-form" action="{{ url_for('create_worksheet_youtube') }}" method="POST">
+        <input type="hidden" name="user_id" value="{{ user.id }}">
+        <div class="mb3">
+            <label for="input-text" class="form-label">Enter your text:</label>
+            <input type="text" class="form-control" name="youtube_url" id="youtube_url" placeholder="Paste YouTube URL here">
+        </div>
+            <div class="mb-3">
+                <label for="num-mcqs" class="form-label">Number of MCQs:</label>
+                <input type="number" class="form-control" name="num-mcqs" id="num-mcqs" min="0" max="10" step="1" value="0">
+            </div>
+            <div class="mb-3">
+                <label for="num-tfs" class="form-label">Number of True/False:</label>
+                <input type="number" class="form-control" name="num-tfs" id="num-tfs" min="0" max="10" step="1" value="0">
+            </div>
+            <div class="mb-3">
+                <label for="num-fibs" class="form-label">Number of Fill-in-the-blanks:</label>
+                <input type="number" class="form-control" name="num-fibs" id="num-fibs" min="0" max="10" step="1" value="0">
+            </div>
+            <div class="mb-3">
+                <label for="w-title" class="form-label">Worksheet Title:</label>
+                <textarea class="form-control" id="w-title" name="w-title" rows="1"></textarea>
+            </div>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-youtube"></i>SUBMIT</button>
+            </div>
     </form>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    const worksheetForm = document.getElementById("worksheet-form");
+    const loadingModal = document.getElementById("loading-modal");
+
     document.querySelector("form").addEventListener("submit", function(event) {
         const youtubeUrl = document.getElementById("youtube_url");
         if (!youtubeUrl.value) {
@@ -28,11 +123,18 @@
             alert("Please enter a valid YouTube URL");
             event.preventDefault();
         }
+        else{
+            event.preventDefault();
+        loadingModal.style.display = "block";
+        
+        worksheetForm.submit();
+        }
     });
 
     function isYoutubeUrl(url) {
         const pattern = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=))([^&=%\?]{11})/;
         return pattern.test(url);
     }
+
 </script>
 {% endblock %}

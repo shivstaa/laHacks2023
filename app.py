@@ -5,9 +5,9 @@ import requests
 import os, json
 from cohere import Client
 from werkzeug.security import check_password_hash, generate_password_hash
-from processInp import process_input
 from genpdf import generate_pdfs
 import hashlib
+from processInp import get_text_from_youtube
 from coheretest import gen_fib, gen_mcqs, gen_tf
 app = Flask(__name__)
 # Configure SQLite database
@@ -65,6 +65,7 @@ class Question(db.Model):
 with app.app_context():
     db.create_all()
 
+
 # -------------------------   USER MANAGEMENT ------------------------------------------
 
 def get_logged_in_user():
@@ -76,6 +77,7 @@ def get_logged_in_user():
 @app.route('/')
 def home():
     user = get_logged_in_user()
+    print(user)
     if not user:
         return redirect(url_for('login'))
     return redirect(url_for('conversion_methods'))
@@ -92,7 +94,7 @@ def login():
 
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
-            return redirect(url_for('create_worksheet'))
+            return redirect(url_for('conversion_methods'))
         else:
             return render_template('login.html', error="Invalid credentials")
     return render_template('login.html',user=user)
@@ -124,7 +126,7 @@ def register():
         db.session.commit()
 
         session['user_id'] = user.id
-        return redirect(url_for('create_worksheet'))
+        return redirect(url_for('conversion_methods'))
     return render_template('register.html')
 
 @app.route('/logout')
@@ -169,6 +171,8 @@ def add_friend(friend_id):
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     user = get_logged_in_user()
+    print(user)
+
     if not user:
         return redirect(url_for('login'))
 
@@ -178,17 +182,17 @@ def profile():
         search_query = request.form['search_query']
         results = User.query.filter(User.username.ilike(f"%{search_query}%")).all()
         return render_template('profile.html', user=user, friends=friends, results=results)
-
     return render_template('profile.html', user=user, friends=friends)
 
 # ------------------------------------------- Worksheet -----------------------------
+
 @app.route('/conversion_methods')
 def conversion_methods():
     user = get_logged_in_user()
     if not user:
         return redirect(url_for('login'))
 
-    return render_template('conversion_methods.html')
+    return render_template('conversion_methods.html', user = user)
 
 @app.route('/create_worksheet/text', methods=['GET', 'POST'])
 def create_worksheet_text():
@@ -293,11 +297,212 @@ def create_worksheet_pdf():
 
     return render_template('create_worksheet_pdf.html', user=user)
 
+@app.route('/create_worksheet/img', methods=['GET', 'POST'])
+def create_worksheet_image():
+    user = get_logged_in_user()
+    if not user:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        input_text = request.form['input-text']
+        w_title = str(request.form['w-title'])
+        num_mcqs = int(request.form['num-mcqs'])
+        num_tfs = int(request.form['num-tfs'])
+        num_fibs = int(request.form['num-fibs'])
+
+        # Generate questions for each type
+        mcqs = gen_mcqs(input_text, num_mcqs)
+        tfs = gen_tf(input_text, num_tfs)
+        fibs = gen_fib(input_text, num_fibs)
+
+        # Save the generated questions and worksheet to the database
+        worksheet = Worksheet(user_id=user.id, title=w_title)
+
+        # Save the PDF filenames to the database
+        question_filename = f'question_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        answer_filename = f'answer_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        worksheet.question_pdf = question_filename
+        worksheet.answer_pdf = answer_filename
+        db.session.add(worksheet)
+        db.session.commit()
+        for question in mcqs:
+            incorrect_answers_json = json.dumps(question["incorrect_answers"])
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='mcq', question=question["question"], correct_answer=question["correct_answer"], incorrect_answers=incorrect_answers_json)
+            db.session.add(db_question)
+        # Save True/False questions
+        for question in tfs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='tf', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        # Save Fill-in-the-blank questions
+        for question in fibs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='fib', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        db.session.commit()
+
+        # Call the generate_pdfs function
+        generate_pdfs(worksheet, w_title, mcqs, tfs, fibs) # Add tfs and fibs as needed
+
+        return redirect(url_for('manage_worksheets'))
+
+    return render_template('create_worksheet_image.html', user=user)
+
+@app.route('/create_worksheet/wiki', methods=['GET', 'POST'])
+def create_worksheet_wikipedia():
+    user = get_logged_in_user()
+    if not user:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        input_text = request.form['input-text']
+        w_title = str(request.form['w-title'])
+        num_mcqs = int(request.form['num-mcqs'])
+        num_tfs = int(request.form['num-tfs'])
+        num_fibs = int(request.form['num-fibs'])
+
+        # Generate questions for each type
+        mcqs = gen_mcqs(input_text, num_mcqs)
+        tfs = gen_tf(input_text, num_tfs)
+        fibs = gen_fib(input_text, num_fibs)
+
+        # Save the generated questions and worksheet to the database
+        worksheet = Worksheet(user_id=user.id, title=w_title)
+
+        # Save the PDF filenames to the database
+        question_filename = f'question_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        answer_filename = f'answer_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        worksheet.question_pdf = question_filename
+        worksheet.answer_pdf = answer_filename
+        db.session.add(worksheet)
+        db.session.commit()
+        for question in mcqs:
+            incorrect_answers_json = json.dumps(question["incorrect_answers"])
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='mcq', question=question["question"], correct_answer=question["correct_answer"], incorrect_answers=incorrect_answers_json)
+            db.session.add(db_question)
+        # Save True/False questions
+        for question in tfs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='tf', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        # Save Fill-in-the-blank questions
+        for question in fibs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='fib', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        db.session.commit()
+
+        # Call the generate_pdfs function
+        generate_pdfs(worksheet, w_title, mcqs, tfs, fibs) # Add tfs and fibs as needed
+
+        return redirect(url_for('manage_worksheets'))
+
+    return render_template('create_worksheet_wikipedia.html', user=user)
+
+@app.route('/create_worksheet/yt', methods=['GET', 'POST'])
+def create_worksheet_youtube():
+    user = get_logged_in_user()
+    if not user:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        input_text = get_text_from_youtube(request.form['youtube_url'])
+        w_title = str(request.form['w-title'])
+        num_mcqs = int(request.form['num-mcqs'])
+        num_tfs = int(request.form['num-tfs'])
+        num_fibs = int(request.form['num-fibs'])
+
+        # Generate questions for each type
+        mcqs = gen_mcqs(input_text, num_mcqs)
+        tfs = gen_tf(input_text, num_tfs)
+        fibs = gen_fib(input_text, num_fibs)
+
+        # Save the generated questions and worksheet to the database
+        worksheet = Worksheet(user_id=user.id, title=w_title)
+
+        # Save the PDF filenames to the database
+        question_filename = f'question_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        answer_filename = f'answer_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        worksheet.question_pdf = question_filename
+        worksheet.answer_pdf = answer_filename
+        db.session.add(worksheet)
+        db.session.commit()
+        for question in mcqs:
+            incorrect_answers_json = json.dumps(question["incorrect_answers"])
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='mcq', question=question["question"], correct_answer=question["correct_answer"], incorrect_answers=incorrect_answers_json)
+            db.session.add(db_question)
+        # Save True/False questions
+        for question in tfs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='tf', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        # Save Fill-in-the-blank questions
+        for question in fibs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='fib', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        db.session.commit()
+
+        # Call the generate_pdfs function
+        generate_pdfs(worksheet, w_title, mcqs, tfs, fibs) # Add tfs and fibs as needed
+
+        return redirect(url_for('manage_worksheets'))
+
+    return render_template('create_worksheet_youtube.html', user=user)
 
 
 
 
+@app.route('/create_worksheet/audio', methods=['GET', 'POST'])
+def create_worksheet_audio():
+    user = get_logged_in_user()
+    if not user:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        input_text = request.form['input-text']
+        w_title = str(request.form['w-title'])
+        num_mcqs = int(request.form['num-mcqs'])
+        num_tfs = int(request.form['num-tfs'])
+        num_fibs = int(request.form['num-fibs'])
 
+        # Generate questions for each type
+        mcqs = gen_mcqs(input_text, num_mcqs)
+        tfs = gen_tf(input_text, num_tfs)
+        fibs = gen_fib(input_text, num_fibs)
+
+        # Save the generated questions and worksheet to the database
+        worksheet = Worksheet(user_id=user.id, title=w_title)
+
+        # Save the PDF filenames to the database
+        question_filename = f'question_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        answer_filename = f'answer_{hashlib.sha1(str(worksheet.id).encode()).hexdigest()}.pdf'
+        worksheet.question_pdf = question_filename
+        worksheet.answer_pdf = answer_filename
+        db.session.add(worksheet)
+        db.session.commit()
+        for question in mcqs:
+            incorrect_answers_json = json.dumps(question["incorrect_answers"])
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='mcq', question=question["question"], correct_answer=question["correct_answer"], incorrect_answers=incorrect_answers_json)
+            db.session.add(db_question)
+        # Save True/False questions
+        for question in tfs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='tf', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        # Save Fill-in-the-blank questions
+        for question in fibs:
+            db_question = Question(worksheet_id=worksheet.id, user_id=user.id, question_type='fib', question=question["question"], correct_answer=question["correct_answer"])
+            db.session.add(db_question)
+
+        db.session.commit()
+
+        # Call the generate_pdfs function
+        generate_pdfs(worksheet, w_title, mcqs, tfs, fibs) # Add tfs and fibs as needed
+
+        return redirect(url_for('manage_worksheets'))
+
+    return render_template('create_worksheet_audio.html', user=user)
 
 @app.route('/worksheet/<int:worksheet_id>/download_questions')
 def download_worksheet_questions(worksheet_id):
@@ -323,7 +528,7 @@ def download_worksheet_answers(worksheet_id):
     response.headers.set('Content-Disposition', 'attachment', filename=f'{worksheet.title}_answers.pdf')
     return response
 
-@app.route('/worksheet/<int:worksheet_id>/delete', methods=['POST'])
+@app.route('/worksheet/<int:worksheet_id>/delete')
 def delete_worksheet(worksheet_id):
     user = get_logged_in_user()
     if not user:

@@ -79,8 +79,8 @@
         </div>
     </div>
     
-    <h2>Create a new worksheet</h2>
-    <form id="worksheet-form" method="POST" action="{{ url_for('create_worksheet') }}">
+    <h2>Create a new worksheet from Raw Text</h2>
+    <form id="worksheet-form" method="POST" action="{{ url_for('create_worksheet_text') }}">
         <input type="hidden" name="user_id" value="{{ user.id }}">
         <div class="mb-3">
             <label for="input-text" class="form-label">Enter your text:</label>
