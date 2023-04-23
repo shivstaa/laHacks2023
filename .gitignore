@@ -1,0 +1,23 @@
+# .gitignore
+
+# Ignore the __pycache__ directory
+__pycache__/
+
+# Ignore the testenv directory
+testenv/
+
+# Ignore the .idea directory if using an IDE like PyCharm
+.idea/
+
+# Ignore other common temporary files
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.swp
+*.swo
+*~
+*.bak
+
+# Ignore the instance directory (which might contain sensitive information)
+instance/

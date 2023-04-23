@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+<div class="container mt-4">
+    <h2>Create Worksheet from Wikipedia</h2>
+    <form action="{{ url_for('create_worksheet_wikipedia') }}" method="POST">
+        <div class="input-group">
+            <input type="text" class="form-control" name="wikipedia_url" id="wikipedia_url" placeholder="Paste Wikipedia URL here">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-wikipedia-w"></i></button>
+            </div>
+        </div>
+        <p class="help-text">Paste a valid Wikipedia URL</p>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        const wikipediaUrl = document.getElementById("wikipedia_url");
+        if (!wikipediaUrl.value) {
+            alert("Please enter a URL");
+            event.preventDefault();
+        } else if (!isWikipediaUrl(wikipediaUrl.value)) {
+            alert("Please enter a valid Wikipedia URL");
+            event.preventDefault();
+        }
+    });
+
+    function isWikipediaUrl(url) {
+        const pattern = /^(?:https?:\/\/)?(?:www\.)?wikipedia\.org\/wiki\/.+/;
+        return pattern.test(url);
+    }
+</script>
+{% endblock %}

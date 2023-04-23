@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+<div class="container mt-4">
+    <h2>Create Worksheet from YouTube</h2>
+    <form action="{{ url_for('create_worksheet_youtube') }}" method="POST">
+        <div class="input-group">
+            <input type="text" class="form-control" name="youtube_url" id="youtube_url" placeholder="Paste YouTube URL here">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary"
+                <button class="btn btn-outline-secondary" type="submit"><i class="fab fa-youtube"></i></button>
+            </div>
+        </div>
+        <p class="help-text">Paste a valid YouTube URL</p>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        const youtubeUrl = document.getElementById("youtube_url");
+        if (!youtubeUrl.value) {
+            alert("Please enter a URL");
+            event.preventDefault();
+        } else if (!isYoutubeUrl(youtubeUrl.value)) {
+            alert("Please enter a valid YouTube URL");
+            event.preventDefault();
+        }
+    });
+
+    function isYoutubeUrl(url) {
+        const pattern = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|.+\?v=))([^&=%\?]{11})/;
+        return pattern.test(url);
+    }
+</script>
+{% endblock %}

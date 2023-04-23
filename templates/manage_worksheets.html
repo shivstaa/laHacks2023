@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Worksheets</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Created at</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for worksheet in worksheets %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ worksheet.title }}</td>
+                <td>{{ worksheet.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>
+                    <a href="{{ url_for('download_worksheet_questions', worksheet_id=worksheet.id) }}" class="btn btn-primary">View Question Sheet</a>
+                    <a href="{{ url_for('download_worksheet_answers', worksheet_id=worksheet.id) }}" class="btn btn-secondary">View Answer Sheet</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

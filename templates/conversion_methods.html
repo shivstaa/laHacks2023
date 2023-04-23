@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Select Conversion Method</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-alt fa-3x"></i>
+                    <h5 class="card-title">Text</h5>
+                    <a href="{{ url_for('create_worksheet_text') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-pdf fa-3x"></i>
+                    <h5 class="card-title">PDF</h5>
+                    <a href="{{ url_for('create_worksheet_pdf') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-image fa-3x"></i>
+                    <h5 class="card-title">Image</h5>
+                    <a href="{{ url_for('create_worksheet_image') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-microphone-alt fa-3x"></i>
+                    <h5 class="card-title">Audio</h5>
+                    <a href="{{ url_for('create_worksheet_audio') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-globe fa-3x"></i>
+                    <h5 class="card-title">Wikipedia Article</h5>
+                    <a href="{{ url_for('create_worksheet_wikipedia') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fab fa-youtube fa-3x"></i>
+                    <h5 class="card-title">YouTube Video</h5>
+                    <a href="{{ url_for('create_worksheet_youtube') }}" class="btn btn-primary">Select</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
