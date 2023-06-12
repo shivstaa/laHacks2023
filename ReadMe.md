@@ -7,6 +7,7 @@ Track 3 - Home Room Submission - Enhancing Academic experience.
  - Teresa Tran
  - Ayush Shejwal
  - Chandraprakash Pandey
+ - Shiv Shah
 ## Description
 
 ![App Screenshot](https://i.imgur.com/W7NUBbJ.jpg)
